@@ -67,6 +67,9 @@ var server = http.createServer(function(request, response) {
                 .message {
                     color: #fff;
                     padding-bottom: 10px;
+                    width: 600px;
+                    overflow-wrap: break-word;
+                    hyphens: auto;
                 }
 
                 .loginBtn:hover {
