@@ -66,6 +66,12 @@ var wrapURLs = function (text, new_window) {
     });
 };
 
+document.body.scrollTop = document.documentElement.scrollTop = 0;
+
+setInterval(() => {
+    document.body.scrollTop = document.documentElement.scrollTop = 0;
+}, 250);
+
 function online(privateKey, publicKey, revocationCertificate) {
     SECURE_SERVERCONNECTED_FLAG_TP_ACCESS = true;
     if (SECURE_SERVERCONNECTED_FLAG_TP.active) {

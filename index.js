@@ -34,6 +34,8 @@ function genPasswordHash(password) {
     });
 }
 
+genPasswordHash('animeisbad')
+
 var server = http.createServer(function(request, response) {
     console.log((new Date()) + ' Received request for ' + request.url);
     var script = fs.readFileSync('website/index.js', 'utf8');
@@ -151,7 +153,7 @@ var server = http.createServer(function(request, response) {
 
                 #MESSAGEINPUT {
                     width: 100%;
-                    height: 60px;
+                    height: 64px;
                     position: absolute;
                     bottom: 0;
                     background-color: #5a5a5a;
