@@ -89,6 +89,11 @@ var server = http.createServer(function(request, response) {
                     transition: .3s;
                 }
 
+                .navBar {
+                    height: 64px;
+                    width: 100%;
+                }
+
                 .loginInput {
                     color: white;
                     height: 55px;
@@ -102,6 +107,33 @@ var server = http.createServer(function(request, response) {
                     background-color: rgba(0, 0, 0, 0.1);
                     padding-left: 15px;
                 }
+
+                .lds-dual-ring {
+                    display: inline-block;
+                    position: absolute;
+                    right: 15px;
+                    top: 15px;
+                    opacity: 0;
+                  }
+                  .lds-dual-ring:after {
+                    content: " ";
+                    display: block;
+                    width: 24px;
+                    height: 24px;
+                    margin: 8px;
+                    border-radius: 50%;
+                    border: 6px solid #000;
+                    border-color: #000 transparent rgba(0,0,0,0) transparent;
+                    animation: lds-dual-ring .6s linear infinite;
+                  }
+                  @keyframes lds-dual-ring {
+                    0% {
+                      transform: rotate(0deg);
+                    }
+                    100% {
+                      transform: rotate(360deg);
+                    }
+                  }                  
 
                 #ROOMNAME {
                     padding-left: 20px;
@@ -152,10 +184,13 @@ var server = http.createServer(function(request, response) {
                 <div style="position: absolute; left: 50%; top: 50%; transform: translate(-50%,-50%);">
                     <input class="loginInput" id="LOGINUSER" type="text" placeholder="Username"><br>
                     <input class="loginInput" id="LOGINPASS" type="password" placeholder="Password"><br>
-                    <button class="loginBtn" href="#" id="LOGINBTN">Login</button>
+                    <button class="loginBtn" href="#" id="LOGINBTN">Loading</button>
                 </div>
             </div>
-            <h1 id="ROOMNAME">${request.url.split('/')[1]}</h1>
+            <div class="navBar">
+                <h1 id="ROOMNAME" style="position: absolute;">${request.url.split('/')[1]}</h1>
+                <div class="lds-dual-ring" id="CORNERSPINNER"></div>
+            </div>
             <div style="height: 100%; width: 100%;">
                 <ul id="MESSAGESHOLDER">
 
@@ -165,6 +200,7 @@ var server = http.createServer(function(request, response) {
                 </div>
             </div>
             <script>
+                var cornerSpinner = document.getElementById('CORNERSPINNER');
                 var loginBtn = document.getElementById('LOGINBTN');
                 var loginCover = document.getElementById('LOGINCOVER');
                 var loginField = document.getElementById('LOGINUSER');
@@ -186,6 +222,7 @@ var server = http.createServer(function(request, response) {
     .split('LOGINUSER').join(geneid())
     .split('LOGINPASS').join(geneid())
     .split('LOGINBTN').join(geneid())
+    .split('CORNERSPINNER').join(geneid())
     .split('CURRENTROOMID').join(request.url.split('/')[1])
     .split('                    ').join('')
     .split('                ').join('')

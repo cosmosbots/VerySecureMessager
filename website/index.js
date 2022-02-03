@@ -55,6 +55,17 @@ var SECURE_SERVERCONNECTED_FLAG_TP = new Proxy({active: false}, {
     }
 });
 
+var wrapURLs = function (text, new_window) {
+    var url_pattern = /(?:(?:https?|ftp):\/\/)?(?:\S+(?::\S*)?@)?(?:(?!10(?:\.\d{1,3}){3})(?!127(?:\.\d{1,3}){3})(?!169\.254(?:\.\d{1,3}){2})(?!192\.168(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\x{00a1}\-\x{ffff}0-9]+-?)*[a-z\x{00a1}\-\x{ffff}0-9]+)(?:\.(?:[a-z\x{00a1}\-\x{ffff}0-9]+-?)*[a-z\x{00a1}\-\x{ffff}0-9]+)*(?:\.(?:[a-z\x{00a1}\-\x{ffff}]{2,})))(?::\d{2,5})?(?:\/[^\s]*)?/ig;
+    var target = (new_window === true || new_window == null) ? '_blank' : '';
+    
+    return text.replace(url_pattern, function (url) {
+      var protocol_pattern = /^(?:(?:https?|ftp):\/\/)/i;
+      var href = protocol_pattern.test(url) ? url : 'http://' + url;
+      return '<a href="' + href + '" target="' + target + '">' + url + '</a>';
+    });
+};
+
 function online(privateKey, publicKey, revocationCertificate) {
     SECURE_SERVERCONNECTED_FLAG_TP_ACCESS = true;
     if (SECURE_SERVERCONNECTED_FLAG_TP.active) {
@@ -64,7 +75,7 @@ function online(privateKey, publicKey, revocationCertificate) {
     }
 
     console.log("Starting WebSockets connection")
-    const connection = new WebSocket('ws://' + location.host + ':80')
+    const connection = new WebSocket('wss://' + location.host)
     console.log("Waiting for connection")
 
     var serverPub = '';
@@ -93,6 +104,7 @@ function online(privateKey, publicKey, revocationCertificate) {
                                 signingKeys: privateKey
                             }).then(r => {
                                 connection.send(r);
+                                showSpinner();
                             });
                         });
                     });
@@ -144,6 +156,7 @@ function online(privateKey, publicKey, revocationCertificate) {
 
     function promptAuth() {
         showLoginCover();
+        loginBtn.innerText = 'Login';
         console.log("Listening for login button click")
         loginBtn.onclick = () => {
             loginBtn.disabled = true;
@@ -158,10 +171,18 @@ function online(privateKey, publicKey, revocationCertificate) {
         newMsgObj.innerHTML = `
         <span style="font-weight:bold;">${dn}</span>
         <br>
-        <span style="color:silver">${message}</span>
+        <span style="color:silver">${wrapURLs(message)}</span>
         `;
         newMsgObj.classList.add('message');
         messageHolder.appendChild(newMsgObj);
+    }
+
+    function showSpinner() {
+        cornerSpinner.style.opacity = 1;
+    }
+
+    function hideSpinner() {
+        cornerSpinner.style.opacity = 0;
     }
 
     connection.onopen = main;
@@ -171,7 +192,7 @@ function online(privateKey, publicKey, revocationCertificate) {
     }
 
     connection.onmessage = function(message) {
-        console.log('recv')
+        showSpinner();
         if (message.isTrusted) {
             var data = JSON.parse(message.data);
             console.log('Received Message: ' + JSON.stringify(data));
@@ -183,6 +204,7 @@ function online(privateKey, publicKey, revocationCertificate) {
                 serverPub = data.encryption.public;
                 state = data.state;
                 clientID = data.clientID;
+                hideSpinner();
                 send({
                     type: 'handshake-com',
                     state: state
@@ -206,6 +228,8 @@ function online(privateKey, publicKey, revocationCertificate) {
                                 }).then(d => {
                                     var { data: decrypted, signatures } = d;
                                     if (signatures.length > 0) {
+                                        hideSpinner();
+
                                         var data = JSON.parse(decrypted);
                                         state = data.state;
 
