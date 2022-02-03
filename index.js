@@ -34,8 +34,6 @@ function genPasswordHash(password) {
     });
 }
 
-genPasswordHash('animeisbad')
-
 var server = http.createServer(function(request, response) {
     console.log((new Date()) + ' Received request for ' + request.url);
     var script = fs.readFileSync('website/index.js', 'utf8');
@@ -48,6 +46,7 @@ var server = http.createServer(function(request, response) {
             <title>VSM - ${request.url.split('/')[1]}</title>
 
             <script>${openpgpScript}</script>
+            <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.5/jquery.min.js" type="text/javascript"></script>
 
             <script>
                 if (${request.url === '/'}) {
