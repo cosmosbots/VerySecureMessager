@@ -64,7 +64,7 @@ function online(privateKey, publicKey, revocationCertificate) {
     }
 
     console.log("Starting WebSockets connection")
-    const connection = new WebSocket('ws://localhost:8080')
+    const connection = new WebSocket('ws://' + location.host + ':80')
     console.log("Waiting for connection")
 
     var serverPub = '';
