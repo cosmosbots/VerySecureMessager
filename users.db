@@ -1,0 +1,20 @@
+{
+    "3691e74d5b917709": {
+        "user": {
+            "displayName": "Turtle"
+        },
+        "password": {
+            "alg": "blowfish",
+            "hash": "$2b$12$M5REd4KUCt468zZYYw3OBespVb4F2Dh/ORo7evF3IIjuV46sp0ifS"
+        }
+    },
+    "b783e729205c1473": {
+        "user": {
+            "displayName": "Test"
+        },
+        "password": {
+            "alg": "blowfish",
+            "hash": "$2b$12$M5REd4KUCt468zZYYw3OBespVb4F2Dh/ORo7evF3IIjuV46sp0ifS"
+        }
+    }
+}

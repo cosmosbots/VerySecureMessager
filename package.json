@@ -1,0 +1,29 @@
+{
+  "name": "verysecuremessager",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cosmosbots/VerySecureMessager.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/cosmosbots/VerySecureMessager/issues"
+  },
+  "homepage": "https://github.com/cosmosbots/VerySecureMessager#readme",
+  "dependencies": {
+    "bcrypt": "^5.0.1",
+    "element-id-generator": "^1.0.0",
+    "openpgp": "^5.1.0",
+    "randomstring": "^1.2.2",
+    "uuid": "^8.3.2",
+    "websocket": "^1.0.34",
+    "websockets": "^0.2.0"
+  }
+}
