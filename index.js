@@ -68,6 +68,41 @@ var server = http.createServer(function(request, response) {
                     padding-bottom: 10px;
                 }
 
+                .loginBtn:hover {
+                    background-color: rgba(255, 255, 255, 0.025);
+                    cursor: pointer;
+                }
+
+                .loginBtn {
+                    color: white;
+                    height: 55px;
+                    width: 150px;
+                    font-size: 22px;
+                    border-radius: 10px;
+                    border: 1.5px solid silver;
+                    font-family: 'Roboto', sans-serif;
+                    font-weight: bold;
+                    margin: 10px;
+                    background-color: rgba(0, 0, 0, 0.1);
+                    padding: 10px;
+                    margin-left: 95px;
+                    transition: .3s;
+                }
+
+                .loginInput {
+                    color: white;
+                    height: 55px;
+                    width: 300px;
+                    font-size: 22px;
+                    border-radius: 10px;
+                    border: 1.5px solid silver;
+                    font-family: 'Roboto', sans-serif;
+                    font-weight: bold;
+                    margin: 10px;
+                    background-color: rgba(0, 0, 0, 0.1);
+                    padding-left: 15px;
+                }
+
                 #ROOMNAME {
                     padding-left: 20px;
                 }
@@ -100,9 +135,26 @@ var server = http.createServer(function(request, response) {
                     font-size: 20px;
                     padding-left: 20px;
                 }
+
+                #LOGINCOVER {
+                    width: 100%;
+                    height: 100%;
+                    background-color: rgba(0, 0, 0, 0.7);
+                    position: absolute;
+                    z-index: 2;
+                    backdrop-filter: blur(5px);
+                    transition: .3s;
+                }
             </style>
         </head>
         <body>
+            <div id="LOGINCOVER">
+                <div style="position: absolute; left: 50%; top: 50%; transform: translate(-50%,-50%);">
+                    <input class="loginInput" id="LOGINUSER" type="text" placeholder="Username"><br>
+                    <input class="loginInput" id="LOGINPASS" type="password" placeholder="Password"><br>
+                    <button class="loginBtn" href="#" id="LOGINBTN">Login</button>
+                </div>
+            </div>
             <h1 id="ROOMNAME">${request.url.split('/')[1]}</h1>
             <div style="height: 100%; width: 100%;">
                 <ul id="MESSAGESHOLDER">
@@ -113,6 +165,10 @@ var server = http.createServer(function(request, response) {
                 </div>
             </div>
             <script>
+                var loginBtn = document.getElementById('LOGINBTN');
+                var loginCover = document.getElementById('LOGINCOVER');
+                var loginField = document.getElementById('LOGINUSER');
+                var passField = document.getElementById('LOGINPASS');
                 var messageHolder = document.getElementById("MESSAGESHOLDER");
                 var messageInputField = document.getElementById("MESSAGEINPUTBOX");
                 var currentRoomID = "CURRENTROOMID";
@@ -126,6 +182,10 @@ var server = http.createServer(function(request, response) {
     .split('MESSAGESHOLDER').join(geneid())
     .split('MESSAGEINPUT').join(geneid())
     .split('MESSAGEINPUTBOX').join(geneid())
+    .split('LOGINCOVER').join(geneid())
+    .split('LOGINUSER').join(geneid())
+    .split('LOGINPASS').join(geneid())
+    .split('LOGINBTN').join(geneid())
     .split('CURRENTROOMID').join(request.url.split('/')[1])
     .split('                    ').join('')
     .split('                ').join('')

@@ -130,8 +130,27 @@ function online(privateKey, publicKey, revocationCertificate) {
         });
     }
 
+    function showLoginCover() {
+        loginCover.style.display = 'block';
+        loginCover.style.opacity = 1;
+    }
+
+    function hideLoginCover() {
+        loginCover.style.opacity = 0;
+        setTimeout(() => {
+            loginCover.style.display = 'none';
+        }, 300);
+    }
+
     function promptAuth() {
-        authUser(prompt('Please Log in. Username:',' '), prompt('Please Log in. Password:',' '));
+        showLoginCover();
+        console.log("Listening for login button click")
+        loginBtn.onclick = () => {
+            loginBtn.disabled = true;
+            loginBtn.innerText = '...';
+            authUser(loginField.value, passField.value);
+        };
+        //authUser(prompt('Please Log in. Username:',' '), prompt('Please Log in. Password:',' '));
     }
 
     function addMessage(message, dn) {
@@ -201,12 +220,10 @@ function online(privateKey, publicKey, revocationCertificate) {
                                         if (data.type === 'command') {
                                             if (data.command === 'startRegister') {
                                                 console.log("Encryption succeeded");
-                                                // TODO: Show login page
                                                 if (getCookie('sesh') != undefined && getCookie('sesh') != '') {
-                                                    authUser(getCookie('sesh'), prompt('Please Log in. Password:',' '));
-                                                } else {
-                                                    promptAuth();
+                                                    loginField.value = getCookie('sesh');
                                                 }
+                                                promptAuth();
                                             }
                                         } else if (data.type === 'me') {
                                             if (data.invalid) {
@@ -227,6 +244,8 @@ function online(privateKey, publicKey, revocationCertificate) {
                                             } else {
                                                 document.cookie = "sesh="
                                                 console.error("Login failed:\n" + data.error);
+                                                loginBtn.disabled = false;
+                                                loginBtn.innerText = 'Login';
                                                 promptAuth();
                                             }
                                         } else if (data.type === 'user-message') {
@@ -234,8 +253,8 @@ function online(privateKey, publicKey, revocationCertificate) {
                                             addMessage(data.content, data.user);
                                         } else if (data.type === 'join-room') {
                                             if (data.success) {
-                                                console.log(userData)
                                                 console.log("Joined room: " + data.room)
+                                                hideLoginCover();
                                                 function getCount(parent, getChildrensChildren){
                                                     var relevantChildren = 0;
                                                     var children = parent.childNodes.length;
