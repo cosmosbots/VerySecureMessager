@@ -472,11 +472,22 @@ wsServer.on('request', function(request) {
                     for (i=0; i<Object.keys(sessionTokens).length; i++) {
                         var k = Object.keys(sessionTokens)[i];
                         if (sessionTokens[k].room === sessionTokens[data.sessionID].room) {
-                            send({
-                                type: 'user-message',
-                                content: data.message,
-                                user: sessionTokens[data.sessionID].displayName
-                            }, clients[sessionTokens[k].clientID].connection, clients[sessionTokens[k].clientID].publicKey);
+                            if (k != data.sessionID) {
+                                send({
+                                    type: 'user-message',
+                                    content: data.message,
+                                    user: sessionTokens[data.sessionID].displayName,
+                                    msgID: data.msgID
+                                }, clients[sessionTokens[k].clientID].connection, clients[sessionTokens[k].clientID].publicKey);
+                            } else {
+                                send({
+                                    type: 'user-message-sent',
+                                    success: true,
+                                    content: data.message,
+                                    user: sessionTokens[data.sessionID].displayName,
+                                    msgID: data.msgID
+                                })
+                            }
                         }
                     }
                 } else if (data.type === 'me' && shakeInitDone) {

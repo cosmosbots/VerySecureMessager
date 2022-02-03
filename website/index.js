@@ -83,7 +83,7 @@ function online(privateKey, publicKey, revocationCertificate) {
     var useEncryption = false;
     var userData = {}
 
-    function send(json) {
+    function send(json, spinner = true) {
         console.log("Sending data to server")
         if (!Object.keys(json).includes('state')) {
             json.state = state;
@@ -165,14 +165,21 @@ function online(privateKey, publicKey, revocationCertificate) {
         //authUser(prompt('Please Log in. Username:',' '), prompt('Please Log in. Password:',' '));
     }
 
-    function addMessage(message, dn) {
+    function addMessage(message, dn, msgid, type) {
+        var opacity = "1";
+        if (type == 'inProgress') {
+            opacity = "0.5";
+        } else if (type == 'confirmed') {
+            opacity = "1";
+        }
         var newMsgObj = document.createElement('li');
         newMsgObj.innerHTML = `
         <span style="font-weight:bold;">${dn}</span>
         <br>
-        <span style="color:silver">${message.replace(/\bhttp[^ ]+/ig, wrap)}</span>
+        <span style="color:silver;opacity:${opacity}">${message.replace(/\bhttp[^ ]+/ig, wrap)}</span>
         `;
         newMsgObj.classList.add('message');
+        newMsgObj.id = msgid;
         messageHolder.appendChild(newMsgObj);
     }
 
@@ -273,7 +280,7 @@ function online(privateKey, publicKey, revocationCertificate) {
                                             }
                                         } else if (data.type === 'user-message') {
                                             console.log("Received user message")
-                                            addMessage(data.content, data.user);
+                                            addMessage(data.content, data.user, data.msgID, "confirmed");
                                         } else if (data.type === 'join-room') {
                                             if (data.success) {
                                                 console.log("Joined room: " + data.room)
@@ -304,15 +311,25 @@ function online(privateKey, publicKey, revocationCertificate) {
                                                 }, 120);
                                                 messageInputField.addEventListener("keyup", function(event) {
                                                     if (event.keyCode === 13) {
+                                                        var msgid = (Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15)).toUpperCase();
                                                         send({
                                                             type: 'message-send',
                                                             message: messageInputField.value,
                                                             roomid: currentRoomID,
-                                                            sessionID: userData.sessionID
-                                                        })
+                                                            sessionID: userData.sessionID,
+                                                            msgID: msgid
+                                                        });
+                                                        addMessage(messageInputField.value, userData.displayName, msgid, "inProgress");
                                                         messageInputField.value = '';
                                                     }
                                                 });
+                                            }
+                                        } else if (data.type === 'user-message-sent') {
+                                            if (data.success) {
+                                                try {
+                                                    document.getElementById(data.msgID).remove()
+                                                    addMessage(data.content, data.user, data.msgID, "confirmed");
+                                                } catch { }
                                             }
                                         }
                                     } else {
