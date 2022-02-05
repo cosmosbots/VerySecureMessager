@@ -72,6 +72,14 @@ var server = http.createServer(function(request, response) {
                     hyphens: auto;
                 }
 
+                .message-lonely {
+                    color: #fff;
+                    padding-bottom: 1px !important;
+                    width: 600px;
+                    overflow-wrap: break-word;
+                    hyphens: auto;
+                }
+
                 .loginBtn:hover {
                     background-color: rgba(255, 255, 255, 0.025);
                     cursor: pointer;

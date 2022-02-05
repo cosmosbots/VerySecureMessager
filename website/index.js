@@ -72,6 +72,10 @@ function online(privateKey, publicKey, revocationCertificate) {
     } else {
         SECURE_SERVERCONNECTED_FLAG_TP.active = true;
     }
+    if (typeof SECURE_SERVERCONNECTED_FLAG_TP != 'object') {
+        codeTamperReaction('SECURE_SERVERCONNECTED_FLAG_TP');
+        return;
+    }
 
     console.log("Starting WebSockets connection")
     const connection = new WebSocket('wss://' + location.host)
@@ -113,6 +117,8 @@ function online(privateKey, publicKey, revocationCertificate) {
             connection.send(JSON.stringify(json));
         }
     }
+
+    var lastMsg = 0;
 
     function main() {
         console.log("Connection ready")
@@ -173,9 +179,32 @@ function online(privateKey, publicKey, revocationCertificate) {
             opacity = "1";
         }
         var newMsgObj = document.createElement('li');
-        newMsgObj.innerHTML = `
-        <span style="font-weight:bold;">${dn}</span>
+        var msgBlockTop = `
+        <span style="font-weight:bold;" class="NameHeader">${dn}</span>
         <br>
+        `
+        try {
+            if (!messageHolder.lastElementChild.className.includes('message-inprogress')) {
+                if (messageHolder.lastElementChild.getElementsByClassName('NameHeaderVal')[0].innerText == dn) {
+                    msgBlockTop = '';
+                    newMsgObj.classList.add('message-lonely');
+                    if (messageHolder.lastElementChild.className == "message") {
+                        messageHolder.lastElementChild.style.paddingBottom = "1px";
+                    }
+                } else {
+                    if (messageHolder.lastElementChild.className.includes('message-lonely')) {
+                        messageHolder.lastElementChild.classList.remove('message-lonely');
+                        messageHolder.lastElementChild.style.paddingBottom = "10px";
+                    }
+                }
+            }
+        } catch { }
+        if (type == 'inProgress') {
+            newMsgObj.classList.add('message-inprogress');
+        }
+        newMsgObj.innerHTML = `
+        ${msgBlockTop}
+        <span style="display:none;" class="NameHeaderVal">${dn}</span>
         <span style="color:silver;opacity:${opacity}">${message.replace(/\bhttp[^ ]+/ig, wrap)}</span>
         `;
         newMsgObj.classList.add('message');
@@ -194,7 +223,8 @@ function online(privateKey, publicKey, revocationCertificate) {
     connection.onopen = main;
 
     connection.onclose = function(e) {
-        console.log("Connection closed")
+        addMessage('Lost connection to server', 'SYSTEM', '0', 'confirmed');
+        console.log("Connection closed");
     }
 
     connection.onmessage = function(message) {
@@ -311,16 +341,19 @@ function online(privateKey, publicKey, revocationCertificate) {
                                                 }, 120);
                                                 messageInputField.addEventListener("keyup", function(event) {
                                                     if (event.keyCode === 13) {
-                                                        var msgid = (Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15)).toUpperCase();
-                                                        send({
-                                                            type: 'message-send',
-                                                            message: messageInputField.value,
-                                                            roomid: currentRoomID,
-                                                            sessionID: userData.sessionID,
-                                                            msgID: msgid
-                                                        });
-                                                        addMessage(messageInputField.value, userData.displayName, msgid, "inProgress");
-                                                        messageInputField.value = '';
+                                                        if (messageInputField.value != '' && lastMsg < (new Date().getTime() - 1000)) {
+                                                            var msgid = (Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15)).toUpperCase();
+                                                            send({
+                                                                type: 'message-send',
+                                                                message: messageInputField.value,
+                                                                roomid: currentRoomID,
+                                                                sessionID: userData.sessionID,
+                                                                msgID: msgid
+                                                            });
+                                                            addMessage(messageInputField.value, userData.displayName, msgid, "inProgress");
+                                                            messageInputField.value = '';
+                                                            lastMsg = new Date().getTime();
+                                                        }
                                                     }
                                                 });
                                             }
